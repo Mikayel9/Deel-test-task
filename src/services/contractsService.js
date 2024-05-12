@@ -15,6 +15,16 @@ async function getContractById(id, profileId){
     return contract;
 };
 
+async function  getAllNonTerminatedContracts(profileId){
+    return await Contract.findAll({
+        where: {
+            [Op.or]: [{ ClientId: profileId }, { ContractorId: profileId }],
+            status: { [Op.ne]: 'terminated' }, 
+        },
+    });
+};
+
 module.exports = {
-    getContractById
+    getContractById,
+    getAllNonTerminatedContracts
 };

@@ -17,4 +17,15 @@ async function getContractById (req, res){
     }
 };
 
-module.exports = { getContractById};
+async function getAllContracts(req, res){
+    const profileId = req.profile.id;
+
+    try {
+        const contracts = await contractsService.getAllNonTerminatedContracts(profileId);
+        res.json(contracts);
+    } catch (error) {
+        handleError(error, res);
+    }
+};
+
+module.exports = { getContractById, getAllContracts};

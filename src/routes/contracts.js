@@ -6,5 +6,6 @@ const { getProfile } = require('../middleware/getProfile');
 router.use(getProfile);
 
 router.get('/:id', contractsController.getContractById);
+router.get('/', contractsController.getAllContracts);
 
 module.exports = router;
