@@ -1,5 +1,5 @@
 const { sequelize, Job, Contract, Profile } = require('../models/model');
-const { Op } = require('sequelize');
+const { Op, fn, col, literal} = require('sequelize');
 
 async function getUnpaidJobsForProfile(profileId) {
     try {
@@ -95,5 +95,46 @@ async function calculateTotalUnpaidJobs(profileId, transaction) {
     }
 }
 
+async function getBestProfession (startDate, endDate) {
+    try {
 
-module.exports = {getUnpaidJobsForProfile, payForJob, calculateTotalUnpaidJobs}
+        const bestProfession = await Job.findOne({
+            include: [
+                {
+                    model: Contract,
+                    attributes: [],
+                    include: [
+                        {
+                            model: Profile,
+                            as: 'Contractor',
+                            attributes: []
+                        }
+                    ]
+                }
+            ],
+            where: {
+                paid: true,
+                paymentDate: {
+                    [Op.between]: [startDate, endDate] 
+                }
+            },
+            attributes: [
+                [literal('`Contract->Contractor`.`profession`'), 'profession'], 
+                [fn('SUM', col('price')), 'totalEarnings']
+            ],
+            group: [literal('`Contract->Contractor`.`profession`')],
+            order: [[fn('SUM', col('price')), 'DESC']],
+            raw: true
+        });
+        if (!bestProfession) {
+            return { message: 'No profession found within the specified date range.' };
+        }
+        return bestProfession
+    } catch (error) {
+        console.error('Error in getBestProfession:', error);
+        throw new Error('Error finding the best profession');
+    }
+};
+
+
+module.exports = {getUnpaidJobsForProfile, payForJob, calculateTotalUnpaidJobs, getBestProfession}
