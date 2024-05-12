@@ -61,9 +61,10 @@ Job.init(
       type: Sequelize.DECIMAL(12,2),
       allowNull: false
     },
+    //Changed default to defaultValue as previously jobs had entities where paid is null
     paid: {
       type: Sequelize.BOOLEAN,
-      default:false
+      defaultValue:false
     },
     paymentDate:{
       type: Sequelize.DATE
