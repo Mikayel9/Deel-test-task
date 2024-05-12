@@ -75,4 +75,25 @@ async function payForJob(profileId, jobId) {
     }
 }
 
-module.exports = {getUnpaidJobsForProfile, payForJob}
+async function calculateTotalUnpaidJobs(profileId, transaction) {
+    try {
+        return await Job.sum('price', {
+            where: {
+                paid: false,
+            },
+            include: [{
+                model: Contract,
+                where: {
+                    status: 'in_progress',
+                    ClientId: profileId 
+                }
+            }],
+            transaction
+        });
+    } catch (error) {
+        throw new Error('Error calculating total unpaid jobs: ' + error.message);
+    }
+}
+
+
+module.exports = {getUnpaidJobsForProfile, payForJob, calculateTotalUnpaidJobs}
