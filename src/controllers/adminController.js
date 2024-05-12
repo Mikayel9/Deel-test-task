@@ -1,4 +1,5 @@
 const { getBestProfession } = require('../services/jobsService');
+const { getBestClients } = require('../services/adminService');
 const { handleError } = require('../utils/errorHandler');
 
 async function getBestProfessionController(req, res) {
@@ -17,4 +18,15 @@ async function getBestProfessionController(req, res) {
     }
 }
 
-module.exports = {getBestProfessionController}
+const getBestClientsController = async (req, res) => {
+    try {
+        const { start, end, limit } = req.query;
+        const bestClients = await getBestClients(start, end, limit);
+        res.json(bestClients);
+    } catch (error) {
+        console.error('Error in getBestClientsController:', error);
+        handleError(error, res);
+    }
+};
+
+module.exports = {getBestProfessionController, getBestClientsController}
